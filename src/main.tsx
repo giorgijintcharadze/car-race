@@ -2,8 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
-import App from "./App.tsx";
-import { QueryProvider } from "./feature/lib/query/QueryProvider.tsx";
+import App from "./App";
+import { QueryProvider } from "./feature/lib/query/QueryProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
