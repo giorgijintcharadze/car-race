@@ -41,7 +41,6 @@ export const GarageForm = () => {
     setNewCarName("");
     setNewCarColor("#000000");
   };
-  console.warn(cars);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
