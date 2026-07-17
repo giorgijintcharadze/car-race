@@ -4,9 +4,12 @@ import { GarageSchema, type GarageFormValues } from "../../schema/garage.schema"
 import { useAppStore } from "../../../../store/useAppStore";
 import { useEffect } from "react";
 import { useGarageStore } from "../../store/garage.store";
+import { useGarage } from "../../hooks/useGarage";
 
 export const GarageForm = () => {
   const { newCarName, newCarColor, setNewCarName, setNewCarColor } = useAppStore();
+
+  const { createMutation } = useGarage();
 
   const addCar = useGarageStore((state) => state.addCar);
   const cars = useGarageStore((state) => state.cars);
@@ -32,7 +35,7 @@ export const GarageForm = () => {
   }, [watch, setNewCarName, setNewCarColor]);
 
   const onSubmit = (data: GarageFormValues) => {
-    addCar(data);
+    createMutation.mutate(data);
     console.warn("მზად არის გასაგზავნად:", data);
     reset({
       name: "",
@@ -40,6 +43,7 @@ export const GarageForm = () => {
     });
     setNewCarName("");
     setNewCarColor("#000000");
+    addCar(data);
   };
 
   return (
@@ -49,8 +53,8 @@ export const GarageForm = () => {
         {errors.color && <p className="text-red-500">{errors.color.message}</p>}
       </div>
       <div>
-        <input type="text" placeholder="Car name" {...register("name")} />
-        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+        <input type="text" placeholder="Car name" {...register("name")} className="pl-2 pr-2" />
+        {errors.name && <p className="text-red-500 ">{errors.name.message}</p>}
       </div>
 
       <button
