@@ -9,7 +9,7 @@ import { useGarage } from "../../hooks/useGarage";
 export const GarageForm = () => {
   const { newCarName, newCarColor, setNewCarName, setNewCarColor } = useAppStore();
 
-  const { createMutation } = useGarage();
+  const { createMutation } = useGarage(1);
 
   const addCar = useGarageStore((state) => state.addCar);
   const cars = useGarageStore((state) => state.cars);
@@ -43,7 +43,7 @@ export const GarageForm = () => {
     });
     setNewCarName("");
     setNewCarColor("#000000");
-    addCar(data);
+    // addCar(data);
   };
 
   return (

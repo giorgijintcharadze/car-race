@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useGarage } from "../hooks/useGarage";
 import CarList from "./ui/CarList";
 import { GarageForm } from "./ui/GarageForm";
+import Pagination from "./ui/Pagination";
 
 const Garage = () => {
   const [List, setList] = useState(false);
-  const { carsQuery, createMutation, deleteMutation, updateMutation } = useGarage();
+  const [page, setPage] = useState(1);
+
+  const { carsQuery } = useGarage(page);
 
   const { data: cars, isLoading, error } = carsQuery;
 
@@ -26,6 +29,12 @@ const Garage = () => {
       </button>
 
       {List && <CarList cars={cars ?? []} />}
+
+      <Pagination
+        page={page}
+        onPrev={() => setPage((prev) => prev - 1)}
+        onNext={() => setPage((prev) => prev + 1)}
+      />
     </div>
   );
 };

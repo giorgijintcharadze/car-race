@@ -2,8 +2,8 @@ import { API } from "../../../common/api/endpoints";
 import type { Car } from "../types/car.types";
 import type { GarageFormValues } from "../types/garage-form.types";
 
-export const getAllCars = async (): Promise<Car[]> => {
-  const res = await fetch(`${API.BASE_URL}${API.GARAGE}`);
+export const getAllCars = async (page: number, limit: number = 2): Promise<Car[]> => {
+  const res = await fetch(`${API.BASE_URL}${API.GARAGE}?_page=${page}&_limit=${limit}`);
 
   if (!res.ok) throw new Error(`error ${res.status}`);
   return res.json();

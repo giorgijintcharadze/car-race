@@ -6,7 +6,7 @@ type CarItemProps = {
 };
 
 const CarItem = ({ car }: CarItemProps) => {
-  const { deleteMutation } = useGarage();
+  const { deleteMutation } = useGarage(1);
 
   return (
     <div className="flex items-center gap-4 py-2">
