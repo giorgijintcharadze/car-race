@@ -1,10 +1,11 @@
 type PaginationProps = {
   page: number;
+  totalPages: number;
   onPrev: () => void;
   onNext: () => void;
 };
 
-const Pagination = ({ page, onPrev, onNext }: PaginationProps) => {
+const Pagination = ({ page, onPrev, onNext, totalPages }: PaginationProps) => {
   return (
     <div className="mt-6 flex items-center justify-center gap-4">
       <button
@@ -21,9 +22,10 @@ const Pagination = ({ page, onPrev, onNext }: PaginationProps) => {
       </div>
 
       <button
+        disabled={page === totalPages}
         onClick={onNext}
         className="rounded-md border border-gray-400 px-4 py-2 text-sm font-medium transition
-                   hover:bg-gray-100 active:scale-95"
+                   hover:bg-gray-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Next ⏭
       </button>

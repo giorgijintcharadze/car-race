@@ -1,13 +1,12 @@
-import { useGarage } from "../../hooks/useGarage";
+import type { UseMutationResult } from "@tanstack/react-query";
 import type { Car } from "../../types/car.types";
 
 type CarItemProps = {
   car: Car;
+  deleteMutation: UseMutationResult<void, Error, number, unknown>;
 };
 
-const CarItem = ({ car }: CarItemProps) => {
-  const { deleteMutation } = useGarage(1);
-
+const CarItem = ({ car, deleteMutation }: CarItemProps) => {
   return (
     <div className="flex items-center gap-4 py-2">
       <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: car.color }} />

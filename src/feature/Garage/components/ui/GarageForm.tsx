@@ -3,16 +3,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { GarageSchema, type GarageFormValues } from "../../schema/garage.schema";
 import { useAppStore } from "../../../../store/useAppStore";
 import { useEffect } from "react";
-import { useGarageStore } from "../../store/garage.store";
-import { useGarage } from "../../hooks/useGarage";
+import { useMutationGarage } from "../../hooks/useMutationGarage";
 
-export const GarageForm = () => {
+type GarageFormProps = {
+  page: number;
+};
+
+export const GarageForm = ({ page }: GarageFormProps) => {
   const { newCarName, newCarColor, setNewCarName, setNewCarColor } = useAppStore();
 
-  const { createMutation } = useGarage(1);
+  const { createMutation } = useMutationGarage(page);
 
-  const addCar = useGarageStore((state) => state.addCar);
-  const cars = useGarageStore((state) => state.cars);
+  // const addCar = useGarageStore((state) => state.addCar);
+  // const cars = useGarageStore((state) => state.cars);
 
   const {
     register,
@@ -43,7 +46,6 @@ export const GarageForm = () => {
     });
     setNewCarName("");
     setNewCarColor("#000000");
-    // addCar(data);
   };
 
   return (

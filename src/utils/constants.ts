@@ -12,3 +12,7 @@ export const CAR_VALIDATION = {
 } as const;
 
 export const DEFAULT_CAR_COLOR = "#000000";
+
+export const GARAGE_LIMIT_PAGE = 2;
+
+export const randomCars = 100;

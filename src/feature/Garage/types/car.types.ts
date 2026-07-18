@@ -3,3 +3,12 @@ export type Car = {
   name: string;
   color: string;
 };
+
+export type GarageResponse = {
+  cars: Car[];
+  total: number;
+};
+
+// export type randomCars = {
+//   count: number;
+// };
