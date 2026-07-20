@@ -22,7 +22,7 @@ const Pagination = ({ page, onPrev, onNext, totalPages }: PaginationProps) => {
       </div>
 
       <button
-        disabled={page === totalPages}
+        disabled={page === totalPages || totalPages === 0}
         onClick={onNext}
         className="rounded-md border border-gray-400 px-4 py-2 text-sm font-medium transition
                    hover:bg-gray-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"

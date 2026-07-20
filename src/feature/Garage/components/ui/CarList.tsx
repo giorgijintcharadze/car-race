@@ -10,9 +10,9 @@ type CarListProps = {
 const CarList = ({ cars, deleteMutation }: CarListProps) => {
   return (
     <div className="text-center mt-10 ">
-      CarList
+      <h3 className="font-bold">CarList</h3>
       <div>
-        <ul className=" bg-yellow-50 w-[200px] mx-auto ">
+        <ul className="bg-yellow-50 w-75 mx-auto">
           {cars.map((car) => (
             <CarItem key={car.id} car={car} deleteMutation={deleteMutation} />
           ))}

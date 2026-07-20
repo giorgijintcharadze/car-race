@@ -4,9 +4,10 @@ import { useMutationGarage } from "../../hooks/useMutationGarage";
 
 type GenerateRandomCarsProps = {
   page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const GenerateRandomCars = ({ page }: GenerateRandomCarsProps) => {
+const GenerateRandomCars = ({ page, setPage }: GenerateRandomCarsProps) => {
   const { generateMutation, resetMutation } = useMutationGarage(page);
   return (
     <div>
@@ -20,7 +21,13 @@ const GenerateRandomCars = ({ page }: GenerateRandomCarsProps) => {
       </button>
       <button
         type="button"
-        onClick={() => resetMutation.mutate()}
+        onClick={() => {
+          resetMutation.mutate(undefined, {
+            onSuccess: () => {
+              setPage(1);
+            },
+          });
+        }}
         disabled={resetMutation.isPending}
         className="rounded bg-red-600 px-4 py-2 text-white disabled:opacity-50"
       >
