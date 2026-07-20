@@ -16,3 +16,11 @@ export const DEFAULT_CAR_COLOR = "#000000";
 export const GARAGE_LIMIT_PAGE = 2;
 
 export const randomCars = 100;
+
+export const ENGINE_STATUS = {
+  STARTED: "started",
+  STOPPED: "stopped",
+  DRIVE: "drive",
+} as const;
+
+export type EngineStatus = (typeof ENGINE_STATUS)[keyof typeof ENGINE_STATUS];

@@ -17,10 +17,22 @@ interface AppState {
   setNewCarName: (name: string) => void;
   newCarColor: string;
   setNewCarColor: (color: string) => void;
+
+  selectedCarId: number | null;
+  setSelectedCarId: (id: number | null) => void;
+
+  updateCarName: string;
+  setUpdateCarName: (name: string) => void;
+  updateCarColor: string;
+  setUpdateCarColor: (color: string) => void;
+
+  movingCars: Record<number, boolean>;
+  setMovingCar: (id: number, isMoving: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
   activeView: VIEWS.GARAGE,
+  selectedCarId: null,
   setActiveView: (view) => set({ activeView: view }),
 
   garagePage: 1,
@@ -30,6 +42,19 @@ export const useAppStore = create<AppState>((set) => ({
 
   newCarName: "",
   setNewCarName: (name) => set({ newCarName: name }),
-  newCarColor: "#000000", // დეფოლტ ფერი
+  newCarColor: "#000000",
   setNewCarColor: (color) => set({ newCarColor: color }),
+
+  setSelectedCarId: (id) => set({ selectedCarId: id }),
+
+  updateCarName: "",
+  setUpdateCarName: (name) => set({ updateCarName: name }),
+  updateCarColor: "#000000",
+  setUpdateCarColor: (color) => set({ updateCarColor: color }),
+
+  movingCars: {},
+  setMovingCar: (id, isMoving) =>
+    set((state) => ({
+      movingCars: { ...state.movingCars, [id]: isMoving },
+    })),
 }));

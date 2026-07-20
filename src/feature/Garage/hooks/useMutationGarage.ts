@@ -54,11 +54,6 @@ export const useMutationGarage = (page: number) => {
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: GarageFormValues }) => updateCar(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["garage"] }),
-  });
-
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteCar(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["garage"] }),
@@ -83,5 +78,5 @@ export const useMutationGarage = (page: number) => {
       queryClient.invalidateQueries({ queryKey: ["garage"] });
     },
   });
-  return { generateMutation, createMutation, updateMutation, deleteMutation, resetMutation };
+  return { generateMutation, createMutation, deleteMutation, resetMutation };
 };

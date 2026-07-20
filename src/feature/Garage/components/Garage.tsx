@@ -3,6 +3,7 @@ import Pagination from "./ui/Pagination";
 import GenerateRandomCars from "./ui/GenerateRandomCars";
 import { useGarageController } from "../hooks/useGarageController";
 import CarList from "./ui/CarList";
+import { UpdateCarForm } from "./ui/UpdateCarForm";
 
 const Garage = () => {
   const { page, setPage, totalPages, cars, isLoading, error, deleteMutation } =
@@ -14,6 +15,7 @@ const Garage = () => {
       <GarageForm page={page} />
       <GenerateRandomCars page={page} setPage={setPage} />
       <CarList cars={cars} isLoading={isLoading} error={error} deleteMutation={deleteMutation} />
+      <UpdateCarForm />
       <Pagination
         page={page}
         totalPages={totalPages}

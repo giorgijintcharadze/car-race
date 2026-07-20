@@ -18,7 +18,8 @@ const Pagination = ({ page, onPrev, onNext, totalPages }: PaginationProps) => {
       </button>
 
       <div className="min-w-24 rounded-md border border-gray-300 px-4 py-2 text-center font-semibold">
-        Page {page}
+        Page <span className="font-bold">{page}</span> of{" "}
+        <span className="font-bold">{totalPages}</span>
       </div>
 
       <button

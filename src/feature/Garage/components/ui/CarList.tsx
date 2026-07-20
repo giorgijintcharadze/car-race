@@ -17,7 +17,7 @@ const CarList = ({ cars, isLoading, error, deleteMutation }: CarListProps) => {
     <div className="text-center mt-10 ">
       <h3 className="font-bold">CarList</h3>
       <div>
-        <ul className="bg-yellow-50 w-75 mx-auto">
+        <ul className="bg-yellow-50 w-90 mx-auto">
           {cars.map((car) => (
             <CarItem key={car.id} car={car} deleteMutation={deleteMutation} />
           ))}

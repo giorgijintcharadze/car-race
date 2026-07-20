@@ -1,5 +1,5 @@
 import { API } from "../../../common/api/endpoints";
-import { GARAGE_LIMIT_PAGE } from "../../../utils/constants";
+import { ENGINE_STATUS, GARAGE_LIMIT_PAGE } from "../../../utils/constants";
 
 import type { Car, GarageResponse } from "../types/car.types";
 import type { GarageFormValues } from "../types/garage-form.types";
@@ -63,4 +63,26 @@ export const getAllCarsWithoutPagination = async (): Promise<Car[]> => {
   if (!res.ok) throw new Error("Failed to fetch cars");
 
   return res.json();
+};
+
+export const toggleEngine = async (id: number, status: "started" | "stopped") => {
+  const res = await fetch(`${API.BASE_URL}/engine?id=${id}&status=${status}`, {
+    method: "PATCH",
+  });
+
+  if (!res.ok) throw new Error("Failed to toggle engine");
+  return res.json(); // აბრუნებს { velocity: number, distance: number }
+};
+
+// მანქანის დაძვრა (Drive)
+export const driveCar = async (id: number) => {
+  const res = await fetch(`${API.BASE_URL}/engine?id=${id}&status=${ENGINE_STATUS.DRIVE}`, {
+    method: "PATCH",
+  });
+
+  if (res.status === 500) {
+    throw new Error("Engine broken down"); // 500 სტატუსის დამუშავება
+  }
+
+  return res.json(); // აბრუნებს { success: true }
 };
