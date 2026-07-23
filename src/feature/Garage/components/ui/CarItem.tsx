@@ -4,6 +4,7 @@ import { useAppStore } from "../../../../store/useAppStore";
 import { useRef } from "react";
 import { driveCar, toggleEngine } from "../../api/garage.api";
 import { ENGINE_STATUS } from "../../../../utils/constants";
+import { saveWinnerResult } from "../../../winners/api/winners.api";
 
 type CarItemProps = {
   car: Car;
@@ -46,6 +47,9 @@ const CarItem = ({ car, deleteMutation }: CarItemProps) => {
 
       // 3. ვაგზავნით Drive რექვესთს პარალელურად
       await driveCar(car.id);
+
+      const timeSeconds = timeMs / 1000;
+      await saveWinnerResult(car.id, timeSeconds);
 
       // თუ Drive წარმატებით დასრულდა და პირველი მივიდა, აქ ემატება Winners ლოგიკა
     } catch (error) {

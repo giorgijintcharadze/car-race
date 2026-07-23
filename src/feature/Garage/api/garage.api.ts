@@ -1,5 +1,6 @@
 import { API } from "../../../common/api/endpoints";
 import { ENGINE_STATUS, GARAGE_LIMIT_PAGE } from "../../../utils/constants";
+import { deleteWinner } from "../../winners/api/winners.api";
 
 import type { Car, GarageResponse } from "../types/car.types";
 import type { GarageFormValues } from "../types/garage-form.types";
@@ -30,6 +31,8 @@ export const getCarById = async (id: number | string): Promise<Car> => {
 export const deleteCar = async (id: number | string) => {
   const res = await fetch(`${API.BASE_URL}${API.GARAGE}/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error(`error ${res.status}`);
+
+  await deleteWinner(Number(id));
 };
 
 export const createCar = async (data: GarageFormValues): Promise<Car> => {

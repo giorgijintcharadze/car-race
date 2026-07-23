@@ -8,7 +8,3 @@ export type GarageResponse = {
   cars: Car[];
   total: number;
 };
-
-// export type randomCars = {
-//   count: number;
-// };

@@ -4,9 +4,8 @@ import {
   createManyCars,
   deleteCar,
   getAllCarsWithoutPagination,
-  updateCar,
 } from "../api/garage.api";
-import type { GarageFormValues } from "../schema/garage.schema";
+
 import type { GarageResponse } from "../types/car.types";
 
 export const useMutationGarage = (page: number) => {
