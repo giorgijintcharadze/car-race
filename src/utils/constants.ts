@@ -15,6 +15,8 @@ export const DEFAULT_CAR_COLOR = "#000000";
 
 export const GARAGE_LIMIT_PAGE = 2;
 
+export const WINNERS_LIMIT_PAGE = 2;
+
 export const randomCars = 100;
 
 export const ENGINE_STATUS = {

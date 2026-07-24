@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { VIEWS, type ViewType } from "../utils/constants";
+import type { SortOrder, WinnerSort } from "../feature/winners/types/winner.types";
 
 interface AppState {
   // 1. აქტიური გვერდი
@@ -28,6 +29,12 @@ interface AppState {
 
   movingCars: Record<number, boolean>;
   setMovingCar: (id: number, isMoving: boolean) => void;
+
+  winnerSort: WinnerSort;
+  setWinnerSort: (sort: WinnerSort) => void;
+
+  winnerOrder: SortOrder;
+  setWinnerOrder: (order: SortOrder) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -57,4 +64,16 @@ export const useAppStore = create<AppState>((set) => ({
     set((state) => ({
       movingCars: { ...state.movingCars, [id]: isMoving },
     })),
+
+  // garagePage: 1,
+  // setGaragePage: (page) => set({ garagePage: page }),
+
+  // winnersPage: 1,
+  // setWinnersPage: (page) => set({ winnersPage: page }),
+
+  winnerSort: "wins",
+  setWinnerSort: (sort) => set({ winnerSort: sort }),
+
+  winnerOrder: "ASC",
+  setWinnerOrder: (order) => set({ winnerOrder: order }),
 }));

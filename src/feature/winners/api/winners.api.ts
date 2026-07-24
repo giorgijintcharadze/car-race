@@ -4,9 +4,9 @@ import type { Winner, WinnersResponse, WinnerSort, SortOrder } from "../types/wi
 
 export const getWinners = async (
   page = 1,
-  limit = GARAGE_LIMIT_PAGE,
   sort: WinnerSort = "time",
   order: SortOrder = "ASC",
+  limit = GARAGE_LIMIT_PAGE,
 ): Promise<WinnersResponse> => {
   const res = await fetch(
     `${API.BASE_URL}${API.WINNERS}?_page=${page}&_limit=${limit}&_sort=${sort}&_order=${order}`,
