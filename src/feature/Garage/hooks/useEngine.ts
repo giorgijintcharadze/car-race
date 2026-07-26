@@ -10,7 +10,6 @@ export const useEngine = (carId: number, carRef: RefObject<HTMLDivElement | null
 
   const { movingCars, setMovingCar } = useAppStore();
 
-  //   const carRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<Animation | null>(null);
 
   const isMoving = movingCars[carId] ?? false;
@@ -23,16 +22,30 @@ export const useEngine = (carId: number, carRef: RefObject<HTMLDivElement | null
 
       const timeMs = Math.round(distance / velocity);
 
+      const animationDuration = timeMs / 2;
+
       if (carRef.current) {
-        animationRef.current = carRef.current.animate(
+        const carElement = carRef.current;
+
+        const track = carElement.parentElement;
+
+        const trackWidth = track?.clientWidth ?? window.innerWidth;
+
+        const carWidth = carElement.offsetWidth;
+
+        const moveDistance = trackWidth - carWidth + 300;
+
+        animationRef.current = carElement.animate(
           [
-            { transform: "translateX(0px)" },
             {
-              transform: "translateX(calc(100vw - 200px))",
+              transform: "translateX(0px)",
+            },
+            {
+              transform: `translateX(${moveDistance}px)`,
             },
           ],
           {
-            duration: timeMs,
+            duration: animationDuration,
             fill: "forwards",
           },
         );

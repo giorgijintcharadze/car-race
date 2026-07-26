@@ -1,4 +1,4 @@
-import type { SortOrder, Winner, WinnerSort, WinnerTableRow } from "../types/winner.types";
+import type { SortOrder, WinnerSort, WinnerTableRow } from "../types/winner.types";
 
 type WinnersTableProps = {
   winners: WinnerTableRow[];

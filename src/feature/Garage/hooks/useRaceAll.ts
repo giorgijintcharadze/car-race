@@ -14,7 +14,6 @@ export const useRace = () => {
   const [winner, setWinner] = useState<{ carName: string; time: number } | null>(null);
 
   const startRace = async (cars: Car[]) => {
-    // Reset winner for new race
     winnerRef.current = null;
     setWinner(null);
 
@@ -22,7 +21,6 @@ export const useRace = () => {
       try {
         setMovingCar(car.id, true);
 
-        // Get the car element by data-car-id attribute
         const carElement = document.querySelector(`[data-car-id="${car.id}"]`);
 
         if (carElement) {
@@ -30,23 +28,21 @@ export const useRace = () => {
           const distance = 5000;
           const timeMs = Math.round(distance / velocity);
 
-          // Create animation for the car
+          const trackWidth = carElement.parentElement?.clientWidth ?? 1000;
+
           const animation = carElement.animate(
-            [{ transform: "translateX(0px)" }, { transform: "translateX(calc(100vw - 200px))" }],
+            [{ transform: "translateX(0px)" }, { transform: `translateX(${trackWidth - 100}px)` }],
             {
               duration: timeMs,
               fill: "forwards",
             },
           );
 
-          // Store animation reference
           animationsRef.current.set(car.id, animation);
 
-          // Wait for animation to complete
           await animation.finished;
         }
 
-        // Execute race logic
         await startEngine(
           {
             carId: car.id,
@@ -54,9 +50,8 @@ export const useRace = () => {
           queryClient,
         );
 
-        // Track first winner
         if (!winnerRef.current) {
-          const timeMs = Math.round((Math.random() * 6 + 4) * 1000); // Calculate time
+          const timeMs = Math.round((Math.random() * 6 + 4) * 1000);
           const timeSeconds = timeMs / 1000;
           winnerRef.current = { carName: car.name, time: timeSeconds };
           setWinner({ carName: car.name, time: timeSeconds });
@@ -73,13 +68,11 @@ export const useRace = () => {
 
   const resetRace = async (cars: Car[]) => {
     try {
-      // Cancel all ongoing animations
       animationsRef.current.forEach((animation) => {
         animation.cancel();
       });
       animationsRef.current.clear();
 
-      // Reset car positions
       cars.forEach((car) => {
         const carElement = document.querySelector(`[data-car-id="${car.id}"]`) as HTMLElement;
         if (carElement) {
@@ -87,7 +80,6 @@ export const useRace = () => {
         }
       });
 
-      // Stop all car engines
       await Promise.all(
         cars.map((car) =>
           toggleEngine(car.id, ENGINE_STATUS.STOPPED).catch((error) => {
@@ -96,12 +88,10 @@ export const useRace = () => {
         ),
       );
 
-      // Reset moving state for all cars
       cars.forEach((car) => {
         setMovingCar(car.id, false);
       });
 
-      // Clear winner
       winnerRef.current = null;
       setWinner(null);
     } catch (error) {

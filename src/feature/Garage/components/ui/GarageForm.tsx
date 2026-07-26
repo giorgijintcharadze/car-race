@@ -14,9 +14,6 @@ export const GarageForm = ({ page }: GarageFormProps) => {
 
   const { createMutation } = useMutationGarage(page);
 
-  // const addCar = useGarageStore((state) => state.addCar);
-  // const cars = useGarageStore((state) => state.cars);
-
   const {
     register,
     handleSubmit,
@@ -28,7 +25,6 @@ export const GarageForm = ({ page }: GarageFormProps) => {
     defaultValues: { name: newCarName, color: newCarColor },
   });
 
-  // ვაკვირდებით ინფუთებს და ვინახავთ Store-ში State-ის შესანარჩუნებლად
   useEffect(() => {
     const subscription = watch((value) => {
       if (value.name !== undefined) setNewCarName(value.name);
@@ -39,7 +35,6 @@ export const GarageForm = ({ page }: GarageFormProps) => {
 
   const onSubmit = (data: GarageFormValues) => {
     createMutation.mutate(data);
-    console.warn("მზად არის გასაგზავნად:", data);
     reset({
       name: "",
       color: newCarColor,

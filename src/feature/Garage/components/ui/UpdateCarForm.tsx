@@ -11,23 +11,15 @@ export const UpdateCarForm = () => {
     useAppStore();
 
   const updateMutation = useUpdateCar();
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<GarageFormValues>({
+  const { register, handleSubmit, watch, reset } = useForm<GarageFormValues>({
     resolver: zodResolver(GarageSchema),
     defaultValues: { name: updateCarName, color: updateCarColor },
   });
 
-  // როდესაც Store-ში შეიცვლება არჩეული მანქანა, ფორმაც უნდა განახლდეს
   useEffect(() => {
     reset({ name: updateCarName, color: updateCarColor });
   }, [updateCarName, updateCarColor, reset]);
 
-  // ფორმის მდგომარეობის შენარჩუნება (Persistent state)
   useEffect(() => {
     const subscription = watch((value) => {
       if (value.name !== undefined) setUpdateCarName(value.name);

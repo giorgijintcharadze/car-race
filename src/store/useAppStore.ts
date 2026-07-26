@@ -65,12 +65,6 @@ export const useAppStore = create<AppState>((set) => ({
       movingCars: { ...state.movingCars, [id]: isMoving },
     })),
 
-  // garagePage: 1,
-  // setGaragePage: (page) => set({ garagePage: page }),
-
-  // winnersPage: 1,
-  // setWinnersPage: (page) => set({ winnersPage: page }),
-
   winnerSort: "wins",
   setWinnerSort: (sort) => set({ winnerSort: sort }),
 
