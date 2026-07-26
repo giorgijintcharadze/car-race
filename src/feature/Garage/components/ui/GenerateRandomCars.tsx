@@ -31,7 +31,7 @@ const GenerateRandomCars = ({ page, setPage }: GenerateRandomCarsProps) => {
         disabled={resetMutation.isPending}
         className="rounded bg-red-600 px-4 py-2 text-white disabled:opacity-50"
       >
-        {resetMutation.isPending ? "Resetting..." : "Reset"}
+        {resetMutation.isPending ? "DELETING..." : "DELETE"}
       </button>
     </div>
   );
