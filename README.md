@@ -2,7 +2,9 @@
 
 Async Race is a React + TypeScript application that simulates a garage of cars, allows users to create and manage vehicles, start races, and track winners.
 
----
+🚀 **Deployed Application:**  
+https://car-race-gules.vercel.app/
+<!-- ---Sorry for the terrible UI, if you give me time I'll fix it. 😁 -->
 
 # Tech Stack
 
