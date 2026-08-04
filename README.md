@@ -1,12 +1,17 @@
 # Async Race
 
-Async Race is a React + TypeScript application that simulates a garage of cars, allows users to create and manage vehicles, start races, and track winners.
+Async Race is a single-page application built with **React**, **TypeScript**, and **Vite**.
 
-🚀 **Deployed Application:**  
+The application allows users to manage a garage of cars, race them using the Engine API, and keep track of winners.
+
+## Live Demo
+
 https://car-race-gules.vercel.app/
 <!-- ---Sorry for the terrible UI, if you give me time and chance I'll fix it. 😁 -->
 
-# Tech Stack
+---
+
+# Technologies
 
 - React
 - TypeScript
@@ -20,232 +25,115 @@ https://car-race-gules.vercel.app/
 
 ---
 
+# Installation
+
+```bash
+npm install
+npm run dev
+```
+
+Production build
+
+```bash
+npm run build
+```
+
+---
+
 # Project Structure
 
-The project follows a feature-based architecture.
-
 ```
-src/
- ├── common/
- ├── feature/
- │    ├── Garage/
- │    └── Winners/
- ├── store/
- ├── utils/
+src
+│
+├── common
+├── feature
+│   ├── Garage
+│   └── Winners
+├── store
+└── utils
 ```
 
-Each feature contains its own:
+Every feature contains:
 
-- API
-- Components
-- Hooks
-- Types
-- Schema
-- Store
-
----
-
-# Garage
-
-Implemented complete CRUD functionality.
-
-## Create Car
-
-- React Hook Form
-- Zod validation
-- Optimistic Updates
-- React Query mutations
-
-Validation:
-
-- Car name is required
-- Maximum 30 characters
-- Color picker
+- api
+- components
+- hooks
+- schema
+- types
 
 ---
 
-## Update Car
+# Features
 
-Implemented car editing.
+## Garage
 
-Features:
-
-- Select car
-- Auto-fill update form
-- Persistent form state using Zustand
-- React Query mutation
-- Automatic list refresh after update
-
----
-
-## Delete Car
-
-Implemented car deletion.
-
-Additional behavior:
-
-- Automatically removes the same record from Winners if it exists.
+- Create car
+- Update car
+- Delete car
+- Generate random cars
+- Reset garage
+- Pagination
+- Optimistic updates
 
 ---
 
-## Generate Random Cars
+## Engine
 
-Implemented bulk creation.
-
-Features:
-
-- Generates random names
-- Random colors
-- Creates multiple cars in parallel
-- Refreshes Garage automatically
+- Start engine
+- Stop engine
+- Drive mode
+- Engine failure handling
+- Web Animations API
 
 ---
 
-## Reset Garage
+## Race
 
-Implemented full garage reset.
-
-Features:
-
-- Fetch all cars
-- Delete all cars
-- Reset pagination
-- Refresh data
+- Start single race
+- Race All
+- Reset Race
+- Winner detection
+- Winner banner
 
 ---
 
-# Pagination
+## Winners
 
-Implemented reusable pagination component.
-
-Features:
-
-- Previous / Next
-- Current page
-- Total pages
-- Disabled buttons
-- Automatic page correction after deleting data
-
----
-
-# Engine
-
-Implemented complete engine API integration.
-
-Supported actions:
-
-- Start Engine
-- Stop Engine
-- Drive Mode
-
-Flow:
-
-1. Start Engine request
-2. Receive velocity and distance
-3. Calculate animation duration
-4. Animate car
-5. Send Drive request
-6. Handle engine failure
-
----
-
-# Car Animation
-
-Implemented animation using Web Animations API.
-
-Features:
-
-- Smooth movement
-- Pause on engine failure
-- Cancel animation on Stop
-- Reset position
-
----
-
-# Winners
-
-Implemented Winners API.
-
-Supported operations:
-
-- GET Winners
-- POST Winner
-- PUT Winner
-- DELETE Winner
-
-Logic:
-
-- First win creates a new winner
-- Existing winner increases wins count
-- Stores best race time
-
----
-
-# Winner + Garage Merge
-
-Winner API only contains:
-
-- id
-- wins
-- time
-
-Garage API contains:
-
-- name
-- color
-
-Both APIs are merged before rendering.
-
-Final table contains:
-
-- Car
-- Name
-- Wins
-- Best Time
-
----
-
-# Sorting
-
-Implemented server-side sorting.
-
-Supported fields:
-
-- Wins
-- Best Time
-
-Supported orders:
-
-- ASC
-- DESC
-
-Sorting is handled by API query parameters.
+- Winners table
+- Save winner
+- Update winner
+- Delete winner
+- Pagination
+- Sorting by wins
+- Sorting by best time
 
 ---
 
 # State Management
 
-Used Zustand for:
+Implemented using **Zustand**
+
+Stores:
 
 - Selected car
 - Update form
 - Garage page
 - Winners page
-- Active view
-- Moving cars state
+- Active page
+- Moving cars
 
 ---
 
-# React Query
+# Data Fetching
 
-Implemented:
+Implemented using **TanStack Query**
 
-## Queries
+Queries
 
 - Garage
 - Winners
 
-## Mutations
+Mutations
 
 - Create
 - Update
@@ -253,46 +141,45 @@ Implemented:
 - Generate
 - Reset
 
-Implemented:
+Features
 
 - Cache invalidation
-- Optimistic Updates
-- Query Keys
+- Optimistic updates
 - Automatic refetch
 
 ---
 
 # Form Validation
 
-Implemented with:
+Implemented with
 
 - React Hook Form
 - Zod
 
-Validation rules:
+Validation
 
-- Required fields
-- Maximum length
+- Required name
+- Maximum 30 characters
 - Color validation
 
 ---
 
 # API
 
-Garage API
+## Garage
 
 - GET
 - POST
 - PUT
 - DELETE
 
-Engine API
+## Engine
 
 - PATCH Start
 - PATCH Stop
 - PATCH Drive
 
-Winner API
+## Winners
 
 - GET
 - POST
@@ -301,35 +188,89 @@ Winner API
 
 ---
 
-# Current Features
+ <!--!-- RS School Async Race Checklist  --> -->
 
-- Create Car
-- Update Car
-- Delete Car
-- Generate Random Cars
-- Reset Garage
-- Pagination
-- Engine Start
-- Engine Stop
-- Drive Mode
-- Car Animation
-- Winner Detection
-- Winners Table
-- Server-side Sorting
-- Zustand State Management
-- React Query Cache Management
+## Basic
+
+- [✅] Garage view
+- [✅] Winners view
+- [✅] TypeScript
+- [✅] Pagination
+- [✅] Feature-based architecture
+
+## Garage
+
+- [✅] Create Car
+- [✅] Update Car
+- [✅] Delete Car
+- [✅] Generate Random Cars
+- [✅] Reset Garage
+
+## Engine
+
+- [✅] Start Engine
+- [✅] Stop Engine
+- [✅] Drive Mode
+- [✅] Engine failure handling
+- [✅] Car animation
+
+## Race
+
+- [✅] Race All
+- [✅] Reset Race
+- [✅] Winner detection
+- [✅] Winner banner
+
+## Winners
+
+- [✅] Save Winner
+- [✅] Update Winner
+- [✅] Delete Winner
+- [✅] Winners table
+- [✅] Pagination
+- [✅] Sort by Wins
+- [✅] Sort by Best Time
 
 ---
 
-# Next Steps
+# Self Assessment
 
-The following features are planned:
+## Functional Requirements
 
-- Race All
-- Reset Race
-- Detect first winner automatically
-- Finish line
-- Reusable engine hook
-- Shared engine service
-- Improved component separation
-- Shadcn UI integration
+| Requirement        | Status |
+| ------------------ | ------ |
+| Garage CRUD        | ✅     |
+| Engine API         | ✅     |
+| Drive Mode         | ✅     |
+| Car Animation      | ✅     |
+| Race All           | ✅     |
+| Reset Race         | ✅     |
+| Winner Detection   | ✅     |
+| Winners API        | ✅     |
+| Winners Pagination | ✅     |
+| Winners Sorting    | ✅     |
+
+## Non-functional Requirements
+
+| Requirement                | Status |
+| -------------------------- | ------ |
+| TypeScript                 | ✅     |
+| React Query                | ✅     |
+| Zustand                    | ✅     |
+| Feature-based Architecture | ✅     |
+| Form Validation            | ✅     |
+| Optimistic Updates         | ✅     |
+
+### Self Score
+
+**-10 points**
+
+Reason:
+
+- Race implementation can still be improved by fully sharing the engine logic between single car start and "Race All" to eliminate duplicated behavior and make both flows use the exact same engine service.
+
+**Score: 375 / 400**
+
+# Author:
+
+Giorgi Jincharadze
