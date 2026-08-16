@@ -36,35 +36,33 @@ export const UpdateCarForm = ({ disabled }: UpdateCarFormProps) => {
     mode: "onChange",
   });
   usePersistedUpdateForm(form);
+  const clearForm = () => {
+    store.clearSelectedCar();
+    form.reset({ name: "", color: DEFAULT_CAR_COLOR });
+  };
 
   const onSubmit = (data: GarageFormValues) => {
     if (store.selectedCarId === null) {
       return;
     }
-    mutation.mutate(
-      { id: store.selectedCarId, data },
-      {
-        onSuccess: () => {
-          store.clearSelectedCar();
-          form.reset({ name: "", color: DEFAULT_CAR_COLOR });
-        },
-      },
-    );
+    mutation.mutate({ id: store.selectedCarId, data }, { onSuccess: clearForm });
   };
 
   const isDisabled = disabled || store.selectedCarId === null;
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="car-form" onSubmit={form.handleSubmit(onSubmit)}>
       <CarFormFields
         disabled={isDisabled}
         errors={form.formState.errors}
         idPrefix="update"
         register={form.register}
       />
-      <button type="submit" disabled={isDisabled || mutation.isPending}>
+      <button type="submit" className="primary-action" disabled={isDisabled || mutation.isPending}>
         {mutation.isPending ? "Updating..." : "Update"}
       </button>
-      {mutation.isError && <p>Could not update the car.</p>}
+      {mutation.isError && (
+        <p className="form-message form-message--error">Could not update the car.</p>
+      )}
     </form>
   );
 };

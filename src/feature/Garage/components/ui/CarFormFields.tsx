@@ -10,23 +10,28 @@ type CarFormFieldsProps = {
 
 const CarFormFields = ({ disabled, errors, idPrefix, register }: CarFormFieldsProps) => (
   <>
-    <span>Car color</span>
-    <input
-      aria-label="Car color"
-      id={`${idPrefix}-color`}
-      type="color"
-      disabled={disabled}
-      {...register("color")}
-    />
-    <span>Car name</span>
-    <input
-      aria-label="Car name"
-      id={`${idPrefix}-name`}
-      type="text"
-      disabled={disabled}
-      {...register("name")}
-    />
-    {errors.name && <p>{errors.name.message}</p>}
+    <label className="field-group" htmlFor={`${idPrefix}-name`}>
+      <span>Car name</span>
+      <input
+        aria-label="Car name"
+        id={`${idPrefix}-name`}
+        type="text"
+        disabled={disabled}
+        placeholder="Enter model name"
+        {...register("name")}
+      />
+    </label>
+    <label className="field-group color-field" htmlFor={`${idPrefix}-color`}>
+      <span>Car color</span>
+      <input
+        aria-label="Car color"
+        id={`${idPrefix}-color`}
+        type="color"
+        disabled={disabled}
+        {...register("color")}
+      />
+    </label>
+    {errors.name && <p className="form-message form-message--error">{errors.name.message}</p>}
   </>
 );
 

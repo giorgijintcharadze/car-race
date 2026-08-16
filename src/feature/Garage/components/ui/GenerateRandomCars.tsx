@@ -8,15 +8,21 @@ type GenerateRandomCarsProps = { disabled: boolean };
 const getResultMessage = (succeeded: number, failed: number): string =>
   failed === 0 ? `${succeeded} cars created.` : `${succeeded} created, ${failed} failed.`;
 
+const resetGarageUi = () => {
+  const { clearSelectedCar, setGaragePage } = useAppStore.getState();
+  clearSelectedCar();
+  setGaragePage(1);
+};
+
 const GenerateRandomCars = ({ disabled }: GenerateRandomCarsProps) => {
-  const setGaragePage = useAppStore((state) => state.setGaragePage);
   const { generateMutation, resetMutation } = useMutationGarage();
   const isPending = generateMutation.isPending || resetMutation.isPending;
 
   return (
-    <div>
+    <div className="bulk-actions">
       <button
         type="button"
+        className="outline-action outline-action--blue"
         disabled={disabled || isPending}
         onClick={() => generateMutation.mutate(generateCars(RANDOM_CARS_COUNT))}
       >
@@ -24,18 +30,25 @@ const GenerateRandomCars = ({ disabled }: GenerateRandomCarsProps) => {
       </button>
       <button
         type="button"
+        className="outline-action outline-action--danger"
         disabled={disabled || isPending}
-        onClick={() => resetMutation.mutate(undefined, { onSuccess: () => setGaragePage(1) })}
+        onClick={() => resetMutation.mutate(undefined, { onSuccess: resetGarageUi })}
       >
         {resetMutation.isPending ? "Deleting cars..." : "Delete All Cars"}
       </button>
       {generateMutation.data && (
-        <p>{getResultMessage(generateMutation.data.succeeded, generateMutation.data.failed)}</p>
+        <p className="form-message">
+          {getResultMessage(generateMutation.data.succeeded, generateMutation.data.failed)}
+        </p>
       )}
       {resetMutation.data && (
-        <p>{`${resetMutation.data.succeeded} deleted, ${resetMutation.data.failed} failed.`}</p>
+        <p className="form-message">
+          {`${resetMutation.data.succeeded} deleted, ${resetMutation.data.failed} failed.`}
+        </p>
       )}
-      {(generateMutation.isError || resetMutation.isError) && <p>Bulk operation failed.</p>}
+      {(generateMutation.isError || resetMutation.isError) && (
+        <p className="form-message form-message--error">Bulk operation failed.</p>
+      )}
     </div>
   );
 };

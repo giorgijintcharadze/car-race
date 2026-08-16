@@ -6,20 +6,24 @@ type CarIconProps = {
 
 const CarIcon = ({ color, name, className = "h-10 w-20" }: CarIconProps) => (
   <svg
-    viewBox="0 0 120 52"
+    viewBox="0 0 120 56"
     className={className}
     role="img"
     aria-label={`${name} car`}
     style={{ color }}
   >
-    <path
-      fill="currentColor"
-      d="M17 34l8-18c2-5 7-8 12-8h43c6 0 11 3 15 8l12 18h6c4 0 7 3 7 7v4H0v-4c0-4 3-7 7-7h10zm19-18c-2 0-4 1-5 4l-6 14h70L85 20c-2-3-4-4-7-4H36z"
-    />
-    <circle cx="27" cy="43" r="9" fill="#1f2937" />
-    <circle cx="91" cy="43" r="9" fill="#1f2937" />
-    <circle cx="27" cy="43" r="4" fill="#d1d5db" />
-    <circle cx="91" cy="43" r="4" fill="#d1d5db" />
+    <g stroke="#050a12" strokeWidth="2">
+      <rect x="13" y="4" width="94" height="48" rx="20" fill="currentColor" />
+      <path
+        d="M35 6c10-4 40-4 50 0l10 13v18L85 50c-11 4-39 4-50 0L25 37V19L35 6z"
+        fill="currentColor"
+      />
+      <path d="M39 7h40" stroke="#fff" strokeOpacity=".48" strokeWidth="3" />
+      <path d="M36 12h48l7 10H29l7-10zM29 34h62l-7 11H36l-7-11z" fill="#102033" />
+      <path d="M58 7h4v42h-4z" fill="#dbeafe" fillOpacity=".7" stroke="none" />
+      <path d="M18 14h9M18 42h9M93 14h9M93 42h9" stroke="#02060c" strokeWidth="6" />
+      <path d="M14 23h7v10h-7M106 23h-7v10h7" fill="#ffd43b" />
+    </g>
   </svg>
 );
 

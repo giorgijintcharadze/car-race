@@ -22,18 +22,21 @@ const WinnerBanner = ({ winner, onClose }: WinnerBannerProps) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal>
+    <div className="winner-overlay" role="dialog" aria-modal>
       <button
         type="button"
         aria-label="Close winner announcement"
-        className="absolute inset-0 bg-black/50"
+        className="winner-backdrop"
         onClick={onClose}
       />
-      <div className="relative rounded-lg bg-yellow-500 px-8 py-6 text-center shadow-2xl">
-        <h2>Winner</h2>
-        <p>{winner.carName} won the race!</p>
-        <p>Time: {winner.time.toFixed(WINNER_TIME_DECIMALS)} seconds</p>
-        <button type="button" onClick={onClose}>
+      <div className="winner-dialog">
+        <span className="winner-trophy" aria-hidden="true">
+          ♜
+        </span>
+        <p className="winner-kicker">Current winner</p>
+        <h2>{winner.carName}</h2>
+        <p>Race completed in {winner.time.toFixed(WINNER_TIME_DECIMALS)} seconds</p>
+        <button className="primary-action" type="button" onClick={onClose}>
           Close
         </button>
       </div>

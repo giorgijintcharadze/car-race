@@ -63,6 +63,7 @@ const useRunRaceCar = (resources: RaceResources) => {
       const result = await runEngine({
         carId: car.id,
         carElement: getCarElement(car.id),
+        isActive: () => runId === resources.runId.current,
         onAnimation: (animation) => {
           if (runId !== resources.runId.current) {
             animation.cancel();

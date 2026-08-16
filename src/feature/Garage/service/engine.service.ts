@@ -5,6 +5,7 @@ import type { EngineRunResult } from "../types/engine.types";
 type RunEngineOptions = {
   carId: number;
   carElement: HTMLElement | null;
+  isActive?: () => boolean;
   onAnimation?: (animation: Animation) => void;
 };
 
@@ -41,6 +42,7 @@ export const animateCar = (
 export const runEngine = async ({
   carId,
   carElement,
+  isActive = () => true,
   onAnimation,
 }: RunEngineOptions): Promise<EngineRunResult> => {
   let durationMs = 0;
@@ -49,6 +51,9 @@ export const runEngine = async ({
   try {
     const { velocity, distance } = await toggleEngine(carId, ENGINE_STATUS.STARTED);
     durationMs = calculateEngineDuration(distance, velocity);
+    if (!isActive()) {
+      return { carId, durationMs, success: false };
+    }
     animation = animateCar(carElement, durationMs);
 
     if (animation) {
@@ -56,10 +61,18 @@ export const runEngine = async ({
     }
 
     await driveCar(carId);
+    if (!isActive()) {
+      animation?.cancel();
+      return { carId, durationMs, success: false };
+    }
     animation?.finish();
     return { carId, durationMs, success: true };
   } catch {
-    animation?.pause();
+    if (isActive()) {
+      animation?.pause();
+    } else {
+      animation?.cancel();
+    }
     return { carId, durationMs, success: false };
   }
 };

@@ -12,18 +12,18 @@ type CarListProps = {
 
 const CarList = ({ cars, isLoading, error, disabled, isDeleting, onDelete }: CarListProps) => {
   if (isLoading) {
-    return <p>Loading cars...</p>;
+    return <p className="empty-state">Loading cars...</p>;
   }
   if (error) {
-    return <p>Could not load the garage.</p>;
+    return <p className="empty-state empty-state--error">Could not load the garage.</p>;
   }
   if (cars.length === 0) {
-    return <p>No cars in the garage.</p>;
+    return <p className="empty-state">No cars in the garage.</p>;
   }
 
   return (
-    <section aria-label="Garage cars" className="mx-auto w-full max-w-5xl px-3">
-      <ul>
+    <section aria-label="Garage cars" className="car-list">
+      <ul className="race-grid">
         {cars.map((car) => (
           <CarItem
             key={car.id}

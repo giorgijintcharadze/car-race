@@ -45,7 +45,7 @@ export const GarageForm = ({ disabled }: GarageFormProps) => {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="car-form" onSubmit={form.handleSubmit(onSubmit)}>
       <CarFormFields
         disabled={disabled}
         errors={form.formState.errors}
@@ -54,11 +54,14 @@ export const GarageForm = ({ disabled }: GarageFormProps) => {
       />
       <button
         type="submit"
+        className="primary-action"
         disabled={disabled || !form.formState.isValid || createMutation.isPending}
       >
         {createMutation.isPending ? "Creating..." : "Create"}
       </button>
-      {createMutation.isError && <p>Could not create the car.</p>}
+      {createMutation.isError && (
+        <p className="form-message form-message--error">Could not create the car.</p>
+      )}
     </form>
   );
 };

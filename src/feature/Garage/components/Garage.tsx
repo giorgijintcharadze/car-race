@@ -2,49 +2,61 @@ import { useInteractionLocked } from "../../../store/useAppStore";
 import { useGarageController } from "../hooks/useGarageController";
 import { useRace } from "../hooks/useRaceAll";
 import CarList from "./ui/CarList";
-import { GarageForm } from "./ui/GarageForm";
-import GenerateRandomCars from "./ui/GenerateRandomCars";
+import GarageSidebar from "./ui/GarageSidebar";
 import Pagination from "./ui/Pagination";
-import { UpdateCarForm } from "./ui/UpdateCarForm";
-import RaceControls from "./ui/RaceControls";
 import WinnerBanner from "./ui/WinnerBanner";
+
+type GarageMainProps = {
+  controller: ReturnType<typeof useGarageController>;
+  disabled: boolean;
+};
+
+const GarageMain = ({ controller, disabled }: GarageMainProps) => (
+  <div className="garage-main">
+    <header className="panel-heading">
+      <h1>
+        Garage: <strong>{controller.total} cars</strong>
+        <span>Page {controller.totalPages === 0 ? 0 : controller.page}</span>
+      </h1>
+      <div className="telemetry" aria-hidden="true">
+        <i /> <i /> <i /> <i /> <i /> <i />
+      </div>
+    </header>
+    <div className="garage-columns" aria-hidden="true">
+      <span>Car name</span>
+      <span>Track</span>
+      <span>Controls</span>
+    </div>
+    <CarList {...controller} disabled={disabled} onDelete={controller.handleDelete} />
+    <Pagination
+      page={controller.page}
+      totalPages={controller.totalPages}
+      disabled={disabled}
+      onPrev={() => controller.setPage(controller.page - 1)}
+      onNext={() => controller.setPage(controller.page + 1)}
+    />
+  </div>
+);
 
 const Garage = () => {
   const controller = useGarageController();
   const { startRace, resetRace, winner, clearWinner, raceStatus } = useRace();
   const isInteractionLocked = useInteractionLocked();
+  const start = () => startRace(controller.cars).catch(() => undefined);
+  const reset = () => resetRace(controller.cars).catch(() => undefined);
 
   return (
-    <div className="text-center">
-      <h1>Garage</h1>
-      <p>Cars in garage: {controller.total}</p>
-      <GarageForm disabled={isInteractionLocked} />
-      <UpdateCarForm disabled={isInteractionLocked} />
-      <GenerateRandomCars disabled={isInteractionLocked} />
-      <RaceControls
+    <section className="screen-panel garage-screen">
+      <GarageSidebar
         carCount={controller.cars.length}
         disabled={isInteractionLocked}
         raceStatus={raceStatus}
-        onRace={() => startRace(controller.cars).catch(() => undefined)}
-        onReset={() => resetRace(controller.cars).catch(() => undefined)}
+        onRace={start}
+        onReset={reset}
       />
       <WinnerBanner winner={winner} onClose={clearWinner} />
-      <CarList
-        cars={controller.cars}
-        isLoading={controller.isLoading}
-        error={controller.error}
-        isDeleting={controller.isDeleting}
-        disabled={isInteractionLocked}
-        onDelete={controller.handleDelete}
-      />
-      <Pagination
-        page={controller.page}
-        totalPages={controller.totalPages}
-        disabled={isInteractionLocked}
-        onPrev={() => controller.setPage(controller.page - 1)}
-        onNext={() => controller.setPage(controller.page + 1)}
-      />
-    </div>
+      <GarageMain controller={controller} disabled={isInteractionLocked} />
+    </section>
   );
 };
 

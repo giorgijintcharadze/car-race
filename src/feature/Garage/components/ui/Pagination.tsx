@@ -7,15 +7,23 @@ type PaginationProps = {
 };
 
 const Pagination = ({ page, onPrev, onNext, totalPages, disabled = false }: PaginationProps) => (
-  <div className="mt-6 flex items-center justify-center gap-4">
-    <button type="button" onClick={onPrev} disabled={disabled || page <= 1}>
-      Previous
+  <div className="pagination" aria-label="Pagination">
+    <button
+      type="button"
+      className="pagination-control"
+      onClick={onPrev}
+      disabled={disabled || page <= 1}
+    >
+      Prev
     </button>
-    <p>
-      Page {totalPages === 0 ? 0 : page} of {totalPages}
+    <p className="pagination-status">
+      <span>{totalPages === 0 ? 0 : page}</span>
+      <small>/</small>
+      <span>{totalPages}</span>
     </p>
     <button
       type="button"
+      className="pagination-control"
       onClick={onNext}
       disabled={disabled || totalPages === 0 || page >= totalPages}
     >

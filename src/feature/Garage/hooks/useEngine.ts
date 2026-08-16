@@ -22,6 +22,7 @@ export const useEngine = (carId: number, carRef: RefObject<HTMLDivElement | null
     const result = await runEngine({
       carId,
       carElement: carRef.current,
+      isActive: () => operationId === operationIdRef.current,
       onAnimation: (animation) => {
         animationRef.current = animation;
       },

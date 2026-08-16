@@ -29,7 +29,7 @@ module.exports = {
   },
   extends: ["airbnb", "airbnb-typescript", "plugin:prettier/recommended"],
   plugins: ["@typescript-eslint", "prettier"],
-  ignorePatterns: ["dist", "node_modules"],
+  ignorePatterns: ["coverage", "dist", "node_modules"],
   rules: {
     "prettier/prettier": "error",
     "@typescript-eslint/no-explicit-any": "error",

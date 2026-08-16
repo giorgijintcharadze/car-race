@@ -3,7 +3,7 @@ import type { RaceStatus } from "../feature/Garage/types/engine.types";
 import type { SortOrder, WinnerSort } from "../feature/winners/types/winner.types";
 import { DEFAULT_CAR_COLOR, VIEWS, type ViewType } from "../utils/constants";
 
-interface AppState {
+export interface AppState {
   activeView: ViewType;
   setActiveView: (view: ViewType) => void;
   garagePage: number;
