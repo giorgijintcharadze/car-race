@@ -1,20 +1,27 @@
-import { useAppStore } from "../../store/useAppStore";
+import { useAppStore, useInteractionLocked } from "../../store/useAppStore";
 import { VIEWS } from "../../utils/constants";
 
 const Navigation = () => {
-  const { setActiveView } = useAppStore();
+  const { activeView, setActiveView } = useAppStore();
+  const disabled = useInteractionLocked();
 
   return (
-    <div className="flex ml-3.5">
-      <nav className="space-x-1.5 bg-amber-400 h-[40px] flex">
-        <button className="cursor-pointer" onClick={() => setActiveView(VIEWS.GARAGE)}>
-          To Garage
-        </button>
-        <button className="cursor-pointer" onClick={() => setActiveView(VIEWS.WINNERS)}>
-          To Winners
-        </button>
-      </nav>
-    </div>
+    <nav aria-label="Main navigation" className="flex gap-2 p-3">
+      <button
+        type="button"
+        disabled={disabled || activeView === VIEWS.GARAGE}
+        onClick={() => setActiveView(VIEWS.GARAGE)}
+      >
+        Garage
+      </button>
+      <button
+        type="button"
+        disabled={disabled || activeView === VIEWS.WINNERS}
+        onClick={() => setActiveView(VIEWS.WINNERS)}
+      >
+        Winners
+      </button>
+    </nav>
   );
 };
 

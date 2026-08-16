@@ -1,67 +1,52 @@
 import { useRef } from "react";
-import type { UseMutationResult } from "@tanstack/react-query";
-import type { Car } from "../../types/car.types";
 import { useAppStore } from "../../../../store/useAppStore";
 import { useEngine } from "../../hooks/useEngine";
+import type { Car } from "../../types/car.types";
+import CarIcon from "./CarIcon";
 
 type CarItemProps = {
   car: Car;
-  deleteMutation: UseMutationResult<void, Error, number, unknown>;
+  disabled: boolean;
+  isDeleting: boolean;
+  onDelete: (id: number) => Promise<void>;
 };
 
-const CarItem = ({ car, deleteMutation }: CarItemProps) => {
-  const { setSelectedCarId, setUpdateCarName, setUpdateCarColor } = useAppStore();
-
+const CarItem = ({ car, disabled, isDeleting, onDelete }: CarItemProps) => {
+  const { raceStatus, selectCar } = useAppStore();
   const carRef = useRef<HTMLDivElement>(null);
-
   const { isMoving, handleStart, handleStop } = useEngine(car.id, carRef);
 
   const handleSelect = () => {
-    setSelectedCarId(car.id);
-    setUpdateCarName(car.name);
-    setUpdateCarColor(car.color);
+    selectCar(car.id, car.name, car.color);
+  };
+
+  const handleDelete = () => {
+    onDelete(car.id).catch(() => undefined);
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between gap-4 py-2">
-        <div className="h-6 w-6 rounded-full border" style={{ backgroundColor: car.color }} />
-
-        <p>{car.name}</p>
-
-        <button
-          onClick={() => deleteMutation.mutate(car.id)}
-          className="ml-10 cursor-pointer rounded-sm bg-red-500 text-white"
-        >
+    <li className="py-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <strong>{car.name}</strong>
+        <button type="button" disabled={disabled || isDeleting} onClick={handleDelete}>
           Delete
         </button>
-
-        <button
-          onClick={handleSelect}
-          className="cursor-pointer rounded-sm bg-green-700 text-white"
-        >
-          SELECT
+        <button type="button" disabled={disabled} onClick={handleSelect}>
+          Select
+        </button>
+        <button type="button" disabled={disabled || isMoving} onClick={handleStart}>
+          Start
+        </button>
+        <button type="button" disabled={!isMoving || raceStatus !== "idle"} onClick={handleStop}>
+          Stop
         </button>
       </div>
-
-      <div className="track">
-        <div className="controls space-x-1">
-          <button onClick={handleStart} disabled={isMoving} className="cursor-pointer">
-            START
-          </button>
-
-          <button onClick={handleStop} disabled={!isMoving} className="cursor-pointer">
-            STOP
-          </button>
-        </div>
-
-        <div className="car-wrapper">
-          <div ref={carRef} className="car-icon" data-car-id={car.id}>
-            🚗 {car.name}
-          </div>
+      <div className="relative min-h-14 w-full overflow-hidden border-b border-dashed border-gray-500">
+        <div ref={carRef} className="absolute bottom-0 left-0 w-fit" data-car-id={car.id}>
+          <CarIcon color={car.color} name={car.name} />
         </div>
       </div>
-    </>
+    </li>
   );
 };
 

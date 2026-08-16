@@ -1,81 +1,50 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  createCar,
-  createManyCars,
-  deleteCar,
-  getAllCarsWithoutPagination,
-} from "../api/garage.api";
+import { createCar, deleteCar, getAllCarsWithoutPagination } from "../api/garage.api";
+import type { GarageFormValues } from "../schema/garage.schema";
 
-import type { GarageResponse } from "../types/car.types";
+export type BulkOperationResult = {
+  succeeded: number;
+  failed: number;
+};
 
-export const useMutationGarage = (page: number) => {
+const summarizeResults = (results: PromiseSettledResult<unknown>[]): BulkOperationResult => {
+  const succeeded = results.filter((result) => result.status === "fulfilled").length;
+  return { succeeded, failed: results.length - succeeded };
+};
+
+const createManyCars = async (cars: GarageFormValues[]): Promise<BulkOperationResult> => {
+  const results = await Promise.allSettled(cars.map((car) => createCar(car)));
+  return summarizeResults(results);
+};
+
+const deleteAllCars = async (): Promise<BulkOperationResult> => {
+  const cars = await getAllCarsWithoutPagination();
+  const results = await Promise.allSettled(cars.map((car) => deleteCar(car.id)));
+  return summarizeResults(results);
+};
+
+export const useMutationGarage = () => {
   const queryClient = useQueryClient();
+  const invalidateGarage = () => queryClient.invalidateQueries({ queryKey: ["garage"] });
+  const invalidateGarageAndWinners = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["garage"] }),
+      queryClient.invalidateQueries({ queryKey: ["winners"] }),
+    ]);
 
-  const createMutation = useMutation({
-    mutationFn: createCar,
-
-    onMutate: async (newCar) => {
-      await queryClient.cancelQueries({
-        queryKey: ["garage", page],
-      });
-
-      const previousData = queryClient.getQueryData<GarageResponse>(["garage", page]);
-
-      queryClient.setQueryData<GarageResponse>(["garage", page], (old) => {
-        if (!old) return old;
-
-        return {
-          ...old,
-          total: old.total + 1,
-          cars: [
-            {
-              id: Date.now(),
-              ...newCar,
-            },
-            ...old.cars,
-          ],
-        };
-      });
-
-      return { previousData };
-    },
-
-    onError: (_err, _newCar, context) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(["garage", page], context.previousData);
-      }
-    },
-
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["garage"],
-      });
-    },
-  });
-
+  const createMutation = useMutation({ mutationFn: createCar, onSuccess: invalidateGarage });
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteCar(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["garage"] }),
+    mutationFn: deleteCar,
+    onSettled: invalidateGarageAndWinners,
   });
-
   const generateMutation = useMutation({
     mutationFn: createManyCars,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["garage"],
-      });
-    },
+    onSettled: invalidateGarage,
   });
-
   const resetMutation = useMutation({
-    mutationFn: async () => {
-      const cars = await getAllCarsWithoutPagination();
-
-      await Promise.all(cars.map((car) => deleteCar(car.id)));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["garage"] });
-    },
+    mutationFn: deleteAllCars,
+    onSettled: invalidateGarageAndWinners,
   });
+
   return { generateMutation, createMutation, deleteMutation, resetMutation };
 };

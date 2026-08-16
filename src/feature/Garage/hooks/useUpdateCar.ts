@@ -8,10 +8,6 @@ export const useUpdateCar = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: GarageFormValues }) => updateCar(id, data),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["garage"],
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["garage"] }),
   });
 };

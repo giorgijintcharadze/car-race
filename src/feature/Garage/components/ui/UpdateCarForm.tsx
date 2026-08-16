@@ -1,65 +1,70 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type UseFormReturn } from "react-hook-form";
 import { useAppStore } from "../../../../store/useAppStore";
-import { GarageSchema, type GarageFormValues } from "../../schema/garage.schema";
-import { useUpdateCar } from "../../hooks/useUpdateCar";
 import { DEFAULT_CAR_COLOR } from "../../../../utils/constants";
+import { useUpdateCar } from "../../hooks/useUpdateCar";
+import { GarageSchema, type GarageFormValues } from "../../schema/garage.schema";
+import CarFormFields from "./CarFormFields";
 
-export const UpdateCarForm = () => {
-  const { selectedCarId, updateCarName, updateCarColor, setUpdateCarName, setUpdateCarColor } =
-    useAppStore();
+type UpdateCarFormProps = { disabled: boolean };
 
-  const updateMutation = useUpdateCar();
-  const { register, handleSubmit, watch, reset } = useForm<GarageFormValues>({
-    resolver: zodResolver(GarageSchema),
-    defaultValues: { name: updateCarName, color: updateCarColor },
-  });
-
+const usePersistedUpdateForm = (form: UseFormReturn<GarageFormValues>) => {
+  const store = useAppStore();
   useEffect(() => {
-    reset({ name: updateCarName, color: updateCarColor });
-  }, [updateCarName, updateCarColor, reset]);
-
+    form.reset({ name: store.updateCarName, color: store.updateCarColor });
+  }, [form, store.selectedCarRevision]);
   useEffect(() => {
-    const subscription = watch((value) => {
-      if (value.name !== undefined) setUpdateCarName(value.name);
-      if (value.color !== undefined) setUpdateCarColor(value.color);
+    const subscription = form.watch((value) => {
+      if (value.name !== undefined) {
+        store.setUpdateCarName(value.name);
+      }
+      if (value.color !== undefined) {
+        store.setUpdateCarColor(value.color);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setUpdateCarName, setUpdateCarColor]);
+  }, [form, store]);
+};
 
-  const onSubmit = async (data: GarageFormValues) => {
-    if (selectedCarId == null) return;
+export const UpdateCarForm = ({ disabled }: UpdateCarFormProps) => {
+  const store = useAppStore();
+  const mutation = useUpdateCar();
+  const form = useForm<GarageFormValues>({
+    resolver: zodResolver(GarageSchema),
+    defaultValues: { name: store.updateCarName, color: store.updateCarColor },
+    mode: "onChange",
+  });
+  usePersistedUpdateForm(form);
 
-    try {
-      await updateMutation.mutateAsync({
-        id: selectedCarId,
-        data,
-      });
-      reset({
-        name: "",
-        color: "#000000",
-      });
-      setUpdateCarName("");
-      setUpdateCarColor(DEFAULT_CAR_COLOR);
-    } catch (error) {
-      console.warn("Update failed", error);
+  const onSubmit = (data: GarageFormValues) => {
+    if (store.selectedCarId === null) {
+      return;
     }
+    mutation.mutate(
+      { id: store.selectedCarId, data },
+      {
+        onSuccess: () => {
+          store.clearSelectedCar();
+          form.reset({ name: "", color: DEFAULT_CAR_COLOR });
+        },
+      },
+    );
   };
 
-  const isDisabled = !selectedCarId;
-
+  const isDisabled = disabled || store.selectedCarId === null;
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex justify-center mt-1.5">
-      <input type="text" disabled={isDisabled} {...register("name")} />
-      <input type="color" disabled={isDisabled} {...register("color")} />
-      <button
-        type="submit"
-        disabled={isDisabled || updateMutation.isPending}
-        className="cursor-pointer ml-1.5 bg-amber-400 rounded-sm "
-      >
-        {updateMutation.isPending ? "UPDATING..." : "UPDATE"}
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <CarFormFields
+        disabled={isDisabled}
+        errors={form.formState.errors}
+        idPrefix="update"
+        register={form.register}
+      />
+      <button type="submit" disabled={isDisabled || mutation.isPending}>
+        {mutation.isPending ? "Updating..." : "Update"}
       </button>
+      {mutation.isError && <p>Could not update the car.</p>}
     </form>
   );
 };

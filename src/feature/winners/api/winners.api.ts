@@ -1,12 +1,12 @@
 import { API } from "../../../common/api/endpoints";
-import { GARAGE_LIMIT_PAGE } from "../../../utils/constants";
+import { HTTP_STATUS, WINNERS_LIMIT_PAGE, WINNER_TIME_DECIMALS } from "../../../utils/constants";
 import type { Winner, WinnersResponse, WinnerSort, SortOrder } from "../types/winner.types";
 
 export const getWinners = async (
   page = 1,
   sort: WinnerSort = "time",
   order: SortOrder = "ASC",
-  limit = GARAGE_LIMIT_PAGE,
+  limit = WINNERS_LIMIT_PAGE,
 ): Promise<WinnersResponse> => {
   const res = await fetch(
     `${API.BASE_URL}${API.WINNERS}?_page=${page}&_limit=${limit}&_sort=${sort}&_order=${order}`,
@@ -28,7 +28,9 @@ export const getWinners = async (
 export const getWinner = async (id: number): Promise<Winner | null> => {
   const res = await fetch(`${API.BASE_URL}${API.WINNERS}/${id}`);
 
-  if (res.status === 404) return null;
+  if (res.status === HTTP_STATUS.NOT_FOUND) {
+    return null;
+  }
 
   if (!res.ok) {
     throw new Error("Failed to fetch winner");
@@ -74,7 +76,7 @@ export const deleteWinner = async (id: number): Promise<void> => {
     method: "DELETE",
   });
 
-  if (!res.ok && res.status !== 404) {
+  if (!res.ok && res.status !== HTTP_STATUS.NOT_FOUND) {
     throw new Error("Failed to delete winner");
   }
 };
@@ -82,7 +84,7 @@ export const deleteWinner = async (id: number): Promise<void> => {
 export const saveWinnerResult = async (carId: number, timeSeconds: number): Promise<void> => {
   const existingWinner = await getWinner(carId);
 
-  const formattedTime = Number(timeSeconds.toFixed(2));
+  const formattedTime = Number(timeSeconds.toFixed(WINNER_TIME_DECIMALS));
 
   if (!existingWinner) {
     await createWinner({

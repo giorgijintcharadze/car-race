@@ -4,14 +4,6 @@ export type Winner = {
   time: number;
 };
 
-export type WinnerCar = {
-  id: number;
-  name: string;
-  color: string;
-  wins: number;
-  time: number;
-};
-
 export type WinnersResponse = {
   winners: Winner[];
   total: number;

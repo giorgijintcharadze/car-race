@@ -1,4 +1,4 @@
-import type { GarageFormValues } from "../feature/Garage/types/garage-form.types";
+import type { GarageFormValues } from "../feature/Garage/schema/garage.schema";
 
 const brands = [
   "Tesla",
@@ -26,10 +26,14 @@ const models = [
   "AMG GT",
 ];
 
+const MAX_RGB_COLOR = 0xffffff;
+const HEX_RADIX = 16;
+const HEX_COLOR_LENGTH = 6;
+
 const randomColor = () =>
-  `#${Math.floor(Math.random() * 16777215)
-    .toString(16)
-    .padStart(6, "0")}`;
+  `#${Math.floor(Math.random() * MAX_RGB_COLOR)
+    .toString(HEX_RADIX)
+    .padStart(HEX_COLOR_LENGTH, "0")}`;
 
 export const generateCars = (randomCars: number): GarageFormValues[] => {
   return Array.from({ length: randomCars }, () => ({

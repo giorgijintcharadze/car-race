@@ -81,6 +81,8 @@ module.exports = {
       },
     ],
     "react/react-in-jsx-scope": "off",
+    "react/require-default-props": "off",
+    "react/jsx-props-no-spreading": "off",
     "react/function-component-definition": [
       "error",
       {
@@ -108,4 +110,14 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ["**/*.test.*", "src/test/**/*"],
+      rules: {
+        "@typescript-eslint/no-magic-numbers": "off",
+        "import/no-extraneous-dependencies": "off",
+        "max-lines-per-function": "off",
+      },
+    },
+  ],
 };

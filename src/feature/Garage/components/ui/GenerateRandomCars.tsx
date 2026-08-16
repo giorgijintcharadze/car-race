@@ -1,38 +1,41 @@
-import { randomCars } from "../../../../utils/constants";
+import { useAppStore } from "../../../../store/useAppStore";
+import { RANDOM_CARS_COUNT } from "../../../../utils/constants";
 import { generateCars } from "../../../../utils/generateCars";
 import { useMutationGarage } from "../../hooks/useMutationGarage";
 
-type GenerateRandomCarsProps = {
-  page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-};
+type GenerateRandomCarsProps = { disabled: boolean };
 
-const GenerateRandomCars = ({ page, setPage }: GenerateRandomCarsProps) => {
-  const { generateMutation, resetMutation } = useMutationGarage(page);
+const getResultMessage = (succeeded: number, failed: number): string =>
+  failed === 0 ? `${succeeded} cars created.` : `${succeeded} created, ${failed} failed.`;
+
+const GenerateRandomCars = ({ disabled }: GenerateRandomCarsProps) => {
+  const setGaragePage = useAppStore((state) => state.setGaragePage);
+  const { generateMutation, resetMutation } = useMutationGarage();
+  const isPending = generateMutation.isPending || resetMutation.isPending;
+
   return (
     <div>
       <button
         type="button"
-        disabled={generateMutation.isPending}
-        onClick={() => generateMutation.mutate(generateCars(randomCars))}
-        className="rounded bg-green-600 px-4 py-2 text-white"
+        disabled={disabled || isPending}
+        onClick={() => generateMutation.mutate(generateCars(RANDOM_CARS_COUNT))}
       >
-        {generateMutation.isPending ? "generating..." : "generateCars"}
+        {generateMutation.isPending ? "Creating cars..." : "Create 100 Cars"}
       </button>
       <button
         type="button"
-        onClick={() => {
-          resetMutation.mutate(undefined, {
-            onSuccess: () => {
-              setPage(1);
-            },
-          });
-        }}
-        disabled={resetMutation.isPending}
-        className="rounded bg-red-600 px-4 py-2 text-white disabled:opacity-50"
+        disabled={disabled || isPending}
+        onClick={() => resetMutation.mutate(undefined, { onSuccess: () => setGaragePage(1) })}
       >
-        {resetMutation.isPending ? "DELETING..." : "DELETE"}
+        {resetMutation.isPending ? "Deleting cars..." : "Delete All Cars"}
       </button>
+      {generateMutation.data && (
+        <p>{getResultMessage(generateMutation.data.succeeded, generateMutation.data.failed)}</p>
+      )}
+      {resetMutation.data && (
+        <p>{`${resetMutation.data.succeeded} deleted, ${resetMutation.data.failed} failed.`}</p>
+      )}
+      {(generateMutation.isError || resetMutation.isError) && <p>Bulk operation failed.</p>}
     </div>
   );
 };
