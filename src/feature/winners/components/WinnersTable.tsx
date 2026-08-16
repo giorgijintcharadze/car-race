@@ -1,57 +1,67 @@
+import type { CSSProperties } from "react";
+import { WINNERS_LIMIT_PAGE, WINNER_TIME_DECIMALS } from "../../../utils/constants";
+import CarIcon from "../../Garage/components/ui/CarIcon";
 import type { SortOrder, WinnerSort, WinnerTableRow } from "../types/winner.types";
 
 type WinnersTableProps = {
   winners: WinnerTableRow[];
+  page: number;
   sort: WinnerSort;
   order: SortOrder;
+  disabled: boolean;
   onSort: (field: WinnerSort) => void;
 };
 
-const WinnersTable = ({ winners, sort, order, onSort }: WinnersTableProps) => {
-  return (
-    <div className="mt-6 overflow-x-auto">
-      <table className="mx-auto min-w-[700px] border-collapse border border-gray-300">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="border px-4 py-2">№</th>
-            <th className="border px-4 py-2">Car</th>
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">
-              <button onClick={() => onSort("wins")} className="cursor-pointer font-semibold">
-                Wins {sort === "wins" && (order === "ASC" ? "▲" : "▼")}
-              </button>
-            </th>
-            <th className="border px-4 py-2">
-              <button onClick={() => onSort("time")} className="cursor-pointer font-semibold">
-                Best Time {sort === "time" && (order === "ASC" ? "▲" : "▼")}
-              </button>
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {winners.map((winner, index) => (
-            <tr key={winner.id} className="text-center">
-              <td className="border px-4 py-2">{index + 1}</td>
-
-              <td className="border px-4 py-2">
-                <div
-                  className="mx-auto h-6 w-6 rounded-full border"
-                  style={{ backgroundColor: winner.color }}
-                />
-              </td>
-
-              <td className="border px-4 py-2">{winner.name}</td>
-
-              <td className="border px-4 py-2">{winner.wins}</td>
-
-              <td className="border px-4 py-2">{winner.time.toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+type SortButtonProps = {
+  disabled: boolean;
+  field: WinnerSort;
+  label: string;
+  order: SortOrder;
+  sort: WinnerSort;
+  onSort: (field: WinnerSort) => void;
 };
+
+const SortButton = ({ disabled, field, label, order, sort, onSort }: SortButtonProps) => (
+  <button type="button" disabled={disabled} onClick={() => onSort(field)}>
+    {label} <span aria-hidden="true">↕</span>
+    <span className="sr-only">
+      {sort === field && (order === "ASC" ? "ascending" : "descending")}
+    </span>
+  </button>
+);
+
+const WinnersTable = ({ winners, page, sort, order, disabled, onSort }: WinnersTableProps) => (
+  <div className="winners-table-wrap">
+    <table className="winners-table">
+      <thead>
+        <tr>
+          <th scope="col">№</th>
+          <th scope="col">Icon</th>
+          <th scope="col">Name</th>
+          <th scope="col">
+            <SortButton {...{ disabled, order, sort, onSort }} field="wins" label="Wins" />
+          </th>
+          <th scope="col">
+            <SortButton {...{ disabled, order, sort, onSort }} field="time" label="Best time (s)" />
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {winners.map((winner, index) => (
+          <tr key={winner.id} style={{ "--winner-accent": winner.color } as CSSProperties}>
+            <td>{(page - 1) * WINNERS_LIMIT_PAGE + index + 1}</td>
+            <td>
+              <CarIcon color={winner.color} name={winner.name} className="winner-car" />
+            </td>
+            <td>{winner.name}</td>
+            <td>{winner.wins}</td>
+            <td>{winner.time.toFixed(WINNER_TIME_DECIMALS)}s</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {winners.length === 0 && <p className="empty-state">No winners yet. Start a race!</p>}
+  </div>
+);
 
 export default WinnersTable;

@@ -1,66 +1,67 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { GarageSchema, type GarageFormValues } from "../../schema/garage.schema";
-import { useAppStore } from "../../../../store/useAppStore";
 import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type UseFormReturn } from "react-hook-form";
+import { useAppStore } from "../../../../store/useAppStore";
+import { DEFAULT_CAR_COLOR } from "../../../../utils/constants";
 import { useMutationGarage } from "../../hooks/useMutationGarage";
+import { GarageSchema, type GarageFormValues } from "../../schema/garage.schema";
+import CarFormFields from "./CarFormFields";
 
-type GarageFormProps = {
-  page: number;
-};
+type GarageFormProps = { disabled: boolean };
 
-export const GarageForm = ({ page }: GarageFormProps) => {
-  const { newCarName, newCarColor, setNewCarName, setNewCarColor } = useAppStore();
-
-  const { createMutation } = useMutationGarage(page);
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isValid },
-    reset,
-  } = useForm<GarageFormValues>({
-    resolver: zodResolver(GarageSchema),
-    defaultValues: { name: newCarName, color: newCarColor },
-  });
-
+const usePersistedCreateForm = (form: UseFormReturn<GarageFormValues>) => {
+  const { setNewCarName, setNewCarColor } = useAppStore();
   useEffect(() => {
-    const subscription = watch((value) => {
-      if (value.name !== undefined) setNewCarName(value.name);
-      if (value.color !== undefined) setNewCarColor(value.color);
+    const subscription = form.watch((value) => {
+      if (value.name !== undefined) {
+        setNewCarName(value.name);
+      }
+      if (value.color !== undefined) {
+        setNewCarColor(value.color);
+      }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setNewCarName, setNewCarColor]);
+  }, [form, setNewCarColor, setNewCarName]);
+};
+
+export const GarageForm = ({ disabled }: GarageFormProps) => {
+  const { newCarName, newCarColor, setNewCarName, setNewCarColor } = useAppStore();
+  const { createMutation } = useMutationGarage();
+  const form = useForm<GarageFormValues>({
+    resolver: zodResolver(GarageSchema),
+    defaultValues: { name: newCarName, color: newCarColor },
+    mode: "onChange",
+  });
+  usePersistedCreateForm(form);
 
   const onSubmit = (data: GarageFormValues) => {
-    createMutation.mutate(data);
-    reset({
-      name: "",
-      color: newCarColor,
+    createMutation.mutate(data, {
+      onSuccess: () => {
+        form.reset({ name: "", color: DEFAULT_CAR_COLOR });
+        setNewCarName("");
+        setNewCarColor(DEFAULT_CAR_COLOR);
+      },
     });
-    setNewCarName("");
-    setNewCarColor("#000000");
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <input type="color" {...register("color")} className="cursor-pointer" />
-        {errors.color && <p className="text-red-500">{errors.color.message}</p>}
-      </div>
-      <div>
-        <input type="text" placeholder="Car name" {...register("name")} className="pl-2 pr-2" />
-        {errors.name && <p className="text-red-500 ">{errors.name.message}</p>}
-      </div>
-
+    <form className="car-form" onSubmit={form.handleSubmit(onSubmit)}>
+      <CarFormFields
+        disabled={disabled}
+        errors={form.formState.errors}
+        idPrefix="new"
+        register={form.register}
+      />
       <button
         type="submit"
-        className="cursor-pointer w-[100px]  rounded-2xl mt-1 bg-amber-50"
-        disabled={!isValid}
+        className="primary-action"
+        disabled={disabled || !form.formState.isValid || createMutation.isPending}
       >
-        CREATE
+        {createMutation.isPending ? "Creating..." : "Create"}
       </button>
+      {createMutation.isError && (
+        <p className="form-message form-message--error">Could not create the car.</p>
+      )}
     </form>
   );
 };

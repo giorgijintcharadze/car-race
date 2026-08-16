@@ -13,16 +13,26 @@ export const CAR_VALIDATION = {
 
 export const DEFAULT_CAR_COLOR = "#000000";
 
+export const CAR_NAME_MAX_LENGTH = 30;
+
 export const GARAGE_LIMIT_PAGE = 7;
 
-export const WINNERS_LIMIT_PAGE = 7;
+export const WINNERS_LIMIT_PAGE = 10;
 
-export const randomCars = 100;
+export const RANDOM_CARS_COUNT = 100;
+
+export const MILLISECONDS_PER_SECOND = 1000;
+
+export const WINNER_TIME_DECIMALS = 2;
+
+export const WINNER_BANNER_DURATION_MS = 5000;
+
+export const HTTP_STATUS = {
+  NOT_FOUND: 404,
+} as const;
 
 export const ENGINE_STATUS = {
   STARTED: "started",
   STOPPED: "stopped",
   DRIVE: "drive",
 } as const;
-
-export type EngineStatus = (typeof ENGINE_STATUS)[keyof typeof ENGINE_STATUS];

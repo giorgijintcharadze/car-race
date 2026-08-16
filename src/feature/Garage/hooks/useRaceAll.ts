@@ -1,112 +1,143 @@
+import {
+  useCallback,
+  useRef,
+  useState,
+  type Dispatch,
+  type MutableRefObject,
+  type SetStateAction,
+} from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { saveWinnerResult } from "../../winners/api/winners.api";
 import { useAppStore } from "../../../store/useAppStore";
-import { useRef, useState } from "react";
-import type { Car } from "../types/car.types";
-import { startEngine } from "../service/engine.service";
+import { ENGINE_STATUS, MILLISECONDS_PER_SECOND } from "../../../utils/constants";
 import { toggleEngine } from "../api/garage.api";
-import { ENGINE_STATUS } from "../../../utils/constants";
+import { runEngine } from "../service/engine.service";
+import type { Car } from "../types/car.types";
+import type { RaceWinner } from "../types/engine.types";
 
-export const useRace = () => {
+type RaceResources = {
+  animations: MutableRefObject<Map<number, Animation>>;
+  runId: MutableRefObject<number>;
+  winner: MutableRefObject<RaceWinner | null>;
+  setWinner: Dispatch<SetStateAction<RaceWinner | null>>;
+};
+
+const getCarElement = (carId: number): HTMLElement | null =>
+  document.querySelector<HTMLElement>(`[data-car-id="${carId}"]`);
+
+const restoreCarPosition = (carId: number): void => {
+  const carElement = getCarElement(carId);
+  if (carElement) {
+    carElement.style.transform = "translateX(0px)";
+  }
+};
+
+const useSaveFirstWinner = (resources: RaceResources) => {
   const queryClient = useQueryClient();
-  const { setMovingCar } = useAppStore();
-  const animationsRef = useRef<Map<number, Animation>>(new Map());
-  const winnerRef = useRef<{ carName: string; time: number } | null>(null);
-  const [winner, setWinner] = useState<{ carName: string; time: number } | null>(null);
-
-  const startRace = async (cars: Car[]) => {
-    winnerRef.current = null;
-    setWinner(null);
-
-    const animationPromises = cars.map(async (car) => {
-      try {
-        setMovingCar(car.id, true);
-
-        const carElement = document.querySelector(`[data-car-id="${car.id}"]`);
-
-        if (carElement) {
-          const velocity = Math.random() * 6 + 4;
-          const distance = 5000;
-          const timeMs = Math.round(distance / velocity);
-
-          const trackWidth = carElement.parentElement?.clientWidth ?? 1000;
-
-          const animation = carElement.animate(
-            [{ transform: "translateX(0px)" }, { transform: `translateX(${trackWidth - 100}px)` }],
-            {
-              duration: timeMs,
-              fill: "forwards",
-            },
-          );
-
-          animationsRef.current.set(car.id, animation);
-
-          await animation.finished;
-        }
-
-        await startEngine(
-          {
-            carId: car.id,
-          },
-          queryClient,
-        );
-
-        if (!winnerRef.current) {
-          const timeMs = Math.round((Math.random() * 6 + 4) * 1000);
-          const timeSeconds = timeMs / 1000;
-          winnerRef.current = { carName: car.name, time: timeSeconds };
-          setWinner({ carName: car.name, time: timeSeconds });
-        }
-      } catch (error) {
-        console.warn(`Race failed for car ${car.id}:`, error);
-      } finally {
-        setMovingCar(car.id, false);
+  const { runId: activeRunId, setWinner, winner: winnerRef } = resources;
+  return useCallback(
+    async (car: Car, durationMs: number, runId: number) => {
+      if (runId !== activeRunId.current || winnerRef.current) {
+        return;
       }
-    });
+      const winner = { carName: car.name, time: durationMs / MILLISECONDS_PER_SECOND };
+      winnerRef.current = winner;
+      setWinner(winner);
+      try {
+        await saveWinnerResult(car.id, winner.time);
+        await queryClient.invalidateQueries({ queryKey: ["winners"] });
+      } catch {
+        // A statistics failure must not leave the completed race locked in running state.
+      }
+    },
+    [activeRunId, queryClient, setWinner, winnerRef],
+  );
+};
 
-    await Promise.all(animationPromises);
-  };
-
-  const resetRace = async (cars: Car[]) => {
-    try {
-      animationsRef.current.forEach((animation) => {
-        animation.cancel();
+const useRunRaceCar = (resources: RaceResources) => {
+  const setMovingCar = useAppStore((state) => state.setMovingCar);
+  const saveFirstWinner = useSaveFirstWinner(resources);
+  return useCallback(
+    async (car: Car, runId: number) => {
+      setMovingCar(car.id, true);
+      const result = await runEngine({
+        carId: car.id,
+        carElement: getCarElement(car.id),
+        isActive: () => runId === resources.runId.current,
+        onAnimation: (animation) => {
+          if (runId !== resources.runId.current) {
+            animation.cancel();
+          } else {
+            resources.animations.current.set(car.id, animation);
+          }
+        },
       });
-      animationsRef.current.clear();
+      if (runId !== resources.runId.current) {
+        return;
+      }
+      setMovingCar(car.id, false);
+      if (result.success) {
+        await saveFirstWinner(car, result.durationMs, runId);
+      }
+    },
+    [resources, saveFirstWinner, setMovingCar],
+  );
+};
 
-      cars.forEach((car) => {
-        const carElement = document.querySelector(`[data-car-id="${car.id}"]`) as HTMLElement;
-        if (carElement) {
-          carElement.style.transform = "translateX(0px)";
-        }
-      });
-
-      await Promise.all(
-        cars.map((car) =>
-          toggleEngine(car.id, ENGINE_STATUS.STOPPED).catch((error) => {
-            console.warn(`Failed to stop car ${car.id}:`, error);
-          }),
-        ),
-      );
-
-      cars.forEach((car) => {
-        setMovingCar(car.id, false);
-      });
-
+const useStartRace = (resources: RaceResources) => {
+  const { raceStatus, setRaceStatus } = useAppStore();
+  const { runId: activeRunId, setWinner, winner: winnerRef } = resources;
+  const runRaceCar = useRunRaceCar(resources);
+  return useCallback(
+    async (cars: Car[]) => {
+      if (useAppStore.getState().raceStatus !== "idle" || cars.length === 0) {
+        return;
+      }
+      const runId = activeRunId.current + 1;
+      activeRunId.current = runId;
       winnerRef.current = null;
       setWinner(null);
-    } catch (error) {
-      console.warn("Reset race failed:", error);
-    }
-  };
+      setRaceStatus("running");
+      await Promise.allSettled(cars.map((car) => runRaceCar(car, runId)));
+      if (runId === activeRunId.current) {
+        setRaceStatus("finished");
+      }
+    },
+    [activeRunId, raceStatus, runRaceCar, setRaceStatus, setWinner, winnerRef],
+  );
+};
 
-  const clearWinner = () => {
-    setWinner(null);
-  };
+const useResetRace = (resources: RaceResources) => {
+  const { setMovingCar, setRaceStatus } = useAppStore();
+  const { animations, runId: activeRunId, setWinner, winner: winnerRef } = resources;
+  return useCallback(
+    async (cars: Car[]) => {
+      setRaceStatus("resetting");
+      activeRunId.current += 1;
+      animations.current.forEach((animation) => animation.cancel());
+      animations.current.clear();
+      cars.forEach((car) => restoreCarPosition(car.id));
+      await Promise.allSettled(cars.map((car) => toggleEngine(car.id, ENGINE_STATUS.STOPPED)));
+      cars.forEach((car) => setMovingCar(car.id, false));
+      winnerRef.current = null;
+      setWinner(null);
+      setRaceStatus("idle");
+    },
+    [activeRunId, animations, setMovingCar, setRaceStatus, setWinner, winnerRef],
+  );
+};
 
-  return {
-    startRace,
-    resetRace,
-    winner,
-    clearWinner,
+export const useRace = () => {
+  const [winner, setWinner] = useState<RaceWinner | null>(null);
+  const resources: RaceResources = {
+    animations: useRef(new Map<number, Animation>()),
+    runId: useRef(0),
+    winner: useRef<RaceWinner | null>(null),
+    setWinner,
   };
+  const startRace = useStartRace(resources);
+  const resetRace = useResetRace(resources);
+  const raceStatus = useAppStore((state) => state.raceStatus);
+  const clearWinner = useCallback(() => setWinner(null), []);
+  return { startRace, resetRace, winner, clearWinner, raceStatus };
 };

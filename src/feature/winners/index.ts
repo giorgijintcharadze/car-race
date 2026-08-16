@@ -1,1 +1,1 @@
-export { default as Winners } from "../winners/components/Winners";
+export { default as Winners } from "./components/Winners";

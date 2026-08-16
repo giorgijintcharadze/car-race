@@ -1,1 +1,1 @@
-export { default as Garage } from "../Garage/components/Garage";
+export { default as Garage } from "./components/Garage";

@@ -1,20 +1,35 @@
-import { useAppStore } from "../../store/useAppStore";
+import { useAppStore, useInteractionLocked } from "../../store/useAppStore";
 import { VIEWS } from "../../utils/constants";
 
 const Navigation = () => {
-  const { setActiveView } = useAppStore();
+  const { activeView, setActiveView } = useAppStore();
+  const disabled = useInteractionLocked();
 
   return (
-    <div className="flex ml-3.5">
-      <nav className="space-x-1.5 bg-amber-400 h-[40px] flex">
-        <button className="cursor-pointer" onClick={() => setActiveView(VIEWS.GARAGE)}>
-          To Garage
-        </button>
-        <button className="cursor-pointer" onClick={() => setActiveView(VIEWS.WINNERS)}>
-          To Winners
-        </button>
-      </nav>
-    </div>
+    <nav aria-label="Main navigation" className="main-navigation">
+      <button
+        type="button"
+        className={`nav-tab ${activeView === VIEWS.GARAGE ? "nav-tab--active" : ""}`}
+        disabled={disabled || activeView === VIEWS.GARAGE}
+        onClick={() => setActiveView(VIEWS.GARAGE)}
+      >
+        <span className="nav-icon" aria-hidden="true">
+          ◆
+        </span>
+        Garage
+      </button>
+      <button
+        type="button"
+        className={`nav-tab ${activeView === VIEWS.WINNERS ? "nav-tab--active" : ""}`}
+        disabled={disabled || activeView === VIEWS.WINNERS}
+        onClick={() => setActiveView(VIEWS.WINNERS)}
+      >
+        <span className="nav-icon" aria-hidden="true">
+          ♜
+        </span>
+        Winners
+      </button>
+    </nav>
   );
 };
 
